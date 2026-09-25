@@ -1,5 +1,6 @@
 package com.cos.jwt.config;
 
+import com.cos.jwt.config.jwt.JwtAuthenticationFilter;
 import com.cos.jwt.filter.MyFilter1;
 import com.cos.jwt.filter.MyFilter3;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final CorsFilter corsFilter;
 
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.addFilterBefore(new MyFilter3(), BasicAuthenticationFilter.class);
@@ -27,6 +29,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilter(corsFilter) // @CrossOrigin(인증X), 시큐리티 필터에 등록 인증(O)
                 .formLogin().disable()
                 .httpBasic().disable()
+                .addFilter(new JwtAuthenticationFilter(authenticationManager())) // AuthenticationManager
                 .authorizeRequests()
                 .antMatchers("/api/v1/user/**")
                 .access("hasRole('ROLE_USER') or hasRole('ROLE_MANAGER') OR hasRole('ROLE_ADMIN')")
@@ -35,5 +38,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/v1/admin/**")
                 .access("hasRole('ROLE_ADMIN')")
                 .anyRequest().permitAll();
+
     }
 }
